@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Campus Exchange</title>
+<style>
+:root{
+  --bg:#f6f5f2; --card:#ffffff; --ink:#1c1b19; --sub:#6b6862;
+  --accent:#1f6f4f; --accent-ink:#ffffff; --line:#e6e3dc; --danger:#b3441e;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15140f; --card:#201f1a; --ink:#f2f0ea; --sub:#a8a49b;
+    --accent:#4fae82; --accent-ink:#0c1a13; --line:#33312a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15140f; --card:#201f1a; --ink:#f2f0ea; --sub:#a8a49b;
+  --accent:#4fae82; --accent-ink:#0c1a13; --line:#33312a;
+}
+*{box-sizing:border-box;}
+html,body{height:auto;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+header{
+  padding:18px 16px calc(14px);
+  padding-top:calc(18px + env(safe-area-inset-top,0px));
+  background:var(--accent); color:var(--accent-ink);
+  position:sticky; top:0; z-index:5;
+}
+header h1{margin:0; font-size:20px; letter-spacing:.2px;}
+header p{margin:4px 0 0; font-size:13px; opacity:.9;}
+.tabs{display:flex; gap:8px; padding:12px 16px 0;}
+.tab{
+  flex:1; text-align:center; padding:10px 8px; border-radius:10px 10px 0 0;
+  background:transparent; color:var(--accent-ink); opacity:.75; font-size:14px;
+  border:none; cursor:pointer; font-weight:600;
+}
+.tab.active{background:var(--bg); color:var(--ink); opacity:1;}
+main{max-width:640px; margin:0 auto; padding:16px; padding-bottom:40px;}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:16px; margin-bottom:14px;
+}
+.grid{display:grid; grid-template-columns:1fr; gap:12px;}
+label{display:block; font-size:13px; color:var(--sub); margin:10px 0 4px;}
+input,select,textarea{
+  width:100%; padding:10px 12px; border-radius:9px; border:1px solid var(--line);
+  background:var(--bg); color:var(--ink); font-size:15px; font-family:inherit;
+}
+textarea{resize:vertical; min-height:64px;}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+button.primary{
+  margin-top:16px; width:100%; padding:12px; border:none; border-radius:9px;
+  background:var(--accent); color:var(--accent-ink); font-size:15px; font-weight:700;
+  cursor:pointer;
+}
+button.primary:disabled{opacity:.6;}
+.item-title{font-size:16px; font-weight:700; margin:0 0 2px;}
+.item-price{font-size:15px; font-weight:700; color:var(--accent);}
+.badge{
+  display:inline-block; font-size:11px; padding:3px 9px; border-radius:999px;
+  background:var(--bg); border:1px solid var(--line); color:var(--sub); margin-bottom:8px;
+}
+.item-desc{font-size:14px; color:var(--sub); margin:6px 0 12px; white-space:pre-wrap;}
+.contact-row{display:flex; gap:8px; flex-wrap:wrap;}
+.btn-wa,.btn-mail{
+  flex:1; min-width:130px; text-align:center; padding:9px 10px; border-radius:8px;
+  font-size:13px; font-weight:700; text-decoration:none; cursor:pointer; border:none;
+}
+.btn-wa{background:#25D366; color:#08210f;}
+.btn-mail{background:var(--bg); color:var(--ink); border:1px solid var(--line);}
+.seller{font-size:12px; color:var(--sub); margin-top:8px;}
+.empty{text-align:center; color:var(--sub); padding:40px 10px; font-size:14px;}
+.notice{font-size:13px; padding:10px 12px; border-radius:9px; margin-bottom:12px;}
+.notice.ok{background:rgba(37,211,102,.15); color:var(--ink);}
+.notice.err{background:rgba(179,68,30,.15); color:var(--danger);}
+select{appearance:none;}
+.overlay{
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.45);
+  align-items:center; justify-content:center; padding:20px; z-index:20;
+}
+.overlay.show{display:flex;}
+.about-card{
+  position:relative; background:var(--card); color:var(--ink); border-radius:16px;
+  padding:24px 20px; max-width:420px; width:100%; border:1px solid var(--line);
+  max-height:85vh; overflow-y:auto;
+}
+.about-card h2{margin:0 0 10px; font-size:19px;}
+.about-card p{font-size:14px; color:var(--sub); line-height:1.5; margin:0 0 12px;}
+.about-card ul{padding-left:0; list-style:none; margin:0 0 4px;}
+.about-card li{font-size:14px; margin-bottom:10px; line-height:1.4;}
+.about-close{
+  position:absolute; top:12px; right:12px; background:none; border:none;
+  font-size:16px; color:var(--sub); cursor:pointer; padding:4px;
+}
+.userbar{display:flex; justify-content:flex-end; margin-top:10px;}
+.profile-pill{
+  background:rgba(255,255,255,.2); color:var(--accent-ink); font-size:12px;
+  padding:6px 12px; border-radius:999px; border:none; cursor:pointer;
+  font-weight:700; display:flex; align-items:center; gap:6px;
+}
+.signup-btn{
+  background:var(--accent-ink); color:var(--accent); font-size:12px;
+  padding:6px 14px; border-radius:999px; border:none; cursor:pointer; font-weight:700;
+}
+#photoPreview img{max-width:100%; max-height:160px; border-radius:10px; display:block;}
+.item-photo{width:100%; max-height:220px; object-fit:cover; border-radius:10px; margin-bottom:10px; display:block;}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎓 Campus Exchange</h1>
+  <p>Buy & sell calculators, drafters, lab coats, cycles & more — straight from seniors.</p>
+  <div class="userbar" id="userbar"></div>
+  <div class="tabs">
+    <button class="tab active" data-tab="browse">Browse</button>
+    <button class="tab" data-tab="sell">List an item</button>
+    <button class="tab" id="aboutBtn" type="button">ℹ️ About</button>
+  </div>
+</header>
+
+<div id="aboutOverlay" class="overlay">
+  <div class="about-card">
+    <button id="aboutClose" class="about-close" aria-label="Close">✕</button>
+    <h2>About Campus Exchange</h2>
+    <p>This is a simple marketplace built for college students. Seniors who are done using things like calculators, drafters, lab coats, cycles or coolers can list them here instead of letting them gather dust — and juniors who need those exact things can find them cheap, right on campus.</p>
+    <ul>
+      <li>📤 <strong>List it</strong> — post your item with a price and a short description.</li>
+      <li>💰 <strong>You set the price</strong> — it's entirely up to you, and it's negotiable if you want.</li>
+      <li>💬 <strong>Direct contact</strong> — buyers reach you straight away on WhatsApp or email. No middleman, no commission.</li>
+    </ul>
+    <button id="aboutGotIt" class="primary" style="margin-top:4px;">Got it</button>
+  </div>
+</div>
+
+<div id="signupOverlay" class="overlay">
+  <div class="about-card">
+    <button id="signupClose" class="about-close" aria-label="Close">✕</button>
+    <h2>Quick sign up</h2>
+    <p>One-time only — needed before you list an item or contact a seller. You won't be asked again on this device.</p>
+    <form id="signupForm" class="grid">
+      <label>Full name</label>
+      <input id="s_name" required placeholder="Your full name">
+      <label>College email</label>
+      <input id="s_email" type="email" required placeholder="you@college.edu">
+      <label>Contact number</label>
+      <input id="s_phone" required placeholder="91XXXXXXXXXX (with country code)">
+      <div class="row2">
+        <div>
+          <label>Branch</label>
+          <input id="s_branch" required placeholder="e.g. Mechanical">
+        </div>
+        <div>
+          <label>Year</label>
+          <select id="s_year">
+            <option>1st year</option>
+            <option>2nd year</option>
+            <option>3rd year</option>
+            <option>4th year</option>
+            <option>5th year</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="primary">Sign up & continue</button>
+    </form>
+  </div>
+</div>
+
+<div id="profileOverlay" class="overlay">
+  <div class="about-card">
+    <button id="profileClose" class="about-close" aria-label="Close">✕</button>
+    <h2>Your profile</h2>
+    <p id="profileDetails" style="color:var(--ink);"></p>
+    <button id="profileEdit" class="primary" style="margin-top:4px;">Edit details</button>
+    <button id="profileSignout" class="btn-mail" style="width:100%; margin-top:8px;">Sign out on this device</button>
+  </div>
+</div>
+<main>
+  <div id="browse" class="grid"></div>
+
+  <form id="sell" class="card grid" style="display:none;">
+    <div id="formNotice"></div>
+    <label>Photo (optional)</label>
+    <input id="f_photo" type="file" accept="image/*">
+    <div id="photoPreview" style="margin-top:8px;"></div>
+
+    <label>Item name</label>
+    <input id="f_name" required placeholder="e.g. Casio fx-991ES calculator">
+
+    <label>Category</label>
+    <select id="f_cat">
+      <option>Calculator</option>
+      <option>Drafter</option>
+      <option>Lab coat / uniform</option>
+      <option>Cycle</option>
+      <option>Cooler</option>
+      <option>Books</option>
+      <option>Other</option>
+    </select>
+
+    <div class="row2">
+      <div>
+        <label>Price (₹)</label>
+        <input id="f_price" type="number" min="0" placeholder="500">
+      </div>
+      <div>
+        <label>Your name</label>
+        <input id="f_seller" required placeholder="Your name">
+      </div>
+    </div>
+
+    <label>Description / condition</label>
+    <textarea id="f_desc" placeholder="Used 1 year, good condition, negotiable..."></textarea>
+
+    <div class="row2">
+      <div>
+        <label>WhatsApp number</label>
+        <input id="f_wa" required placeholder="91XXXXXXXXXX (with country code)">
+      </div>
+      <div>
+        <label>Email</label>
+        <input id="f_email" type="email" required placeholder="you@college.edu">
+      </div>
+    </div>
+
+    <button type="submit" class="primary" id="submitBtn">Post listing</button>
+  </form>
+</main>
+
+<script>
+let db = null;
+let user = null;
+let assets = null;
+let listings = [];
+let profile = null;
+let pendingAction = null; // 'sell' | {type:'contact', url}
+
+function loadLocalProfile(){
+  try{
+    const raw = localStorage.getItem('ce_profile');
+    if (raw) profile = JSON.parse(raw);
+  }catch(e){ /* no storage */ }
+}
+function saveLocalProfile(p){
+  try{ localStorage.setItem('ce_profile', JSON.stringify(p)); }catch(e){}
+}
+async function syncProfileToDb(){
+  if (!db || !user) return;
+  try{
+    const id = await user.id();
+    if (!id) return;
+    if (!profile){
+      const doc = await db.doc('data/users/' + id + '/profile').get();
+      if (doc && doc.exists) { profile = doc.data(); saveLocalProfile(profile); }
+    } else {
+      await db.doc('data/users/' + id + '/profile').set(profile);
+    }
+  }catch(e){ /* fine, local copy still works */ }
+}
+
+function renderUserbar(){
+  const bar = document.getElementById('userbar');
+  if (profile){
+    bar.innerHTML = `<button class="profile-pill" id="profilePillBtn">👤 ${escapeHtml(profile.name.split(' ')[0])} • ${escapeHtml(profile.year||'')}</button>`;
+    document.getElementById('profilePillBtn').addEventListener('click', openProfile);
+  } else {
+    bar.innerHTML = `<button class="signup-btn" id="signupTopBtn">Sign up</button>`;
+    document.getElementById('signupTopBtn').addEventListener('click', () => { pendingAction=null; openSignup(); });
+  }
+}
+
+function openSignup(){
+  if (profile){
+    document.getElementById('s_name').value = profile.name;
+    document.getElementById('s_email').value = profile.email;
+    document.getElementById('s_phone').value = profile.phone;
+    document.getElementById('s_branch').value = profile.branch;
+    document.getElementById('s_year').value = profile.year;
+  }
+  document.getElementById('signupOverlay').classList.add('show');
+}
+function closeSignup(){ document.getElementById('signupOverlay').classList.remove('show'); }
+
+function openProfile(){
+  document.getElementById('profileDetails').innerHTML =
+    `<strong>${escapeHtml(profile.name)}</strong><br>${escapeHtml(profile.branch)} · ${escapeHtml(profile.year)}<br>${escapeHtml(profile.email)}<br>${escapeHtml(profile.phone)}`;
+  document.getElementById('profileOverlay').classList.add('show');
+}
+function closeProfile(){ document.getElementById('profileOverlay').classList.remove('show'); }
+
+const browseEl = document.getElementById('browse');
+const sellForm = document.getElementById('sell');
+const tabs = document.querySelectorAll('.tab');
+
+tabs.forEach(t => {
+  if (!t.dataset.tab) return; // skip the About button
+  t.addEventListener('click', () => {
+    if (t.dataset.tab === 'sell' && !profile){
+      pendingAction = 'sell';
+      openSignup();
+      return;
+    }
+    tabs.forEach(x => { if (x.dataset.tab) x.classList.remove('active'); });
+    t.classList.add('active');
+    const tab = t.dataset.tab;
+    browseEl.style.display = tab === 'browse' ? 'grid' : 'none';
+    sellForm.style.display = tab === 'sell' ? 'grid' : 'none';
+    if (tab === 'sell' && profile){
+      document.getElementById('f_seller').value = profile.name;
+      document.getElementById('f_wa').value = profile.phone;
+      document.getElementById('f_email').value = profile.email;
+    }
+  });
+});
+
+const aboutOverlay = document.getElementById('aboutOverlay');
+function openAbout(){ aboutOverlay.classList.add('show'); }
+function closeAbout(){ aboutOverlay.classList.remove('show'); }
+document.getElementById('aboutBtn').addEventListener('click', openAbout);
+document.getElementById('aboutClose').addEventListener('click', closeAbout);
+document.getElementById('aboutGotIt').addEventListener('click', closeAbout);
+aboutOverlay.addEventListener('click', (e) => { if (e.target === aboutOverlay) closeAbout(); });
+
+function waLink(number, itemName){
+  const digits = (number||'').replace(/[^0-9]/g,'');
+  const text = encodeURIComponent(`Hi! I'm interested in your listing "${itemName}" on Campus Exchange.`);
+  return `https://wa.me/${digits}?text=${text}`;
+}
+
+function render(){
+  if (!listings.length){
+    browseEl.innerHTML = '<div class="empty">No listings yet. Be the first senior to list something! 👀</div>';
+    return;
+  }
+  const sorted = [...listings].sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  browseEl.innerHTML = sorted.map((item, i) => `
+    <div class="card">
+      ${item.photoUrl ? `<img class="item-photo" src="${item.photoUrl}" alt="${escapeHtml(item.name)}">` : ''}
+      <span class="badge">${escapeHtml(item.category||'Other')}</span>
+      <p class="item-title">${escapeHtml(item.name)}</p>
+      ${item.price ? `<p class="item-price">₹${escapeHtml(String(item.price))}</p>` : ''}
+      ${item.desc ? `<p class="item-desc">${escapeHtml(item.desc)}</p>` : ''}
+      <div class="contact-row">
+        ${item.wa ? `<button class="btn-wa contact-btn" data-kind="wa" data-idx="${i}">💬 WhatsApp</button>` : ''}
+        ${item.email ? `<button class="btn-mail contact-btn" data-kind="mail" data-idx="${i}">✉️ Email</button>` : ''}
+      </div>
+      <p class="seller">Listed by ${escapeHtml(item.seller||'a student')}</p>
+    </div>
+  `).join('');
+  document.querySelectorAll('.contact-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = sorted[Number(btn.dataset.idx)];
+      const url = btn.dataset.kind === 'wa'
+        ? waLink(item.wa, item.name)
+        : `mailto:${encodeURIComponent(item.email)}?subject=${encodeURIComponent('Interest in '+item.name)}`;
+      if (!profile){
+        pendingAction = { type:'open', url };
+        openSignup();
+        return;
+      }
+      window.open(url, '_blank');
+    });
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function notice(msg, ok){
+  document.getElementById('formNotice').innerHTML =
+    `<div class="notice ${ok?'ok':'err'}">${escapeHtml(msg)}</div>`;
+}
+
+async function init(){
+  loadLocalProfile();
+  renderUserbar();
+
+  try{
+    db = await claude.use('db');
+  }catch(e){ db = null; }
+  try{
+    user = await claude.use('user');
+  }catch(e){ user = null; }
+  try{
+    assets = await claude.use('assets');
+  }catch(e){ assets = null; }
+
+  await syncProfileToDb();
+  renderUserbar();
+
+  if (db){
+    try{
+      const col = db.collection('listings');
+      col.onSnapshot((snap) => {
+        listings = (snap.docs||[])
+          .filter(d => d.exists)
+          .map(d => d.data());
+        render();
+      });
+    }catch(e){
+      render();
+    }
+  } else {
+    render();
+  }
+}
+
+document.getElementById('f_photo').addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  const preview = document.getElementById('photoPreview');
+  if (!file){ preview.innerHTML = ''; return; }
+  const reader = new FileReader();
+  reader.onload = () => { preview.innerHTML = `<img src="${reader.result}" alt="preview">`; };
+  reader.readAsDataURL(file);
+});
+
+sellForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const item = {
+    name: document.getElementById('f_name').value.trim(),
+    category: document.getElementById('f_cat').value,
+    price: document.getElementById('f_price').value.trim(),
+    seller: document.getElementById('f_seller').value.trim(),
+    desc: document.getElementById('f_desc').value.trim(),
+    wa: document.getElementById('f_wa').value.trim(),
+    email: document.getElementById('f_email').value.trim(),
+    createdAt: Date.now()
+  };
+  if (!item.name || !item.seller || !item.wa || !item.email){
+    notice('Please fill in item name, your name, WhatsApp number and email.', false);
+    return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Posting...';
+
+  if (!db){
+    notice('Storage is unavailable right now — could not post the listing.', false);
+    btn.disabled = false; btn.textContent = 'Post listing';
+    return;
+  }
+
+  const photoFile = document.getElementById('f_photo').files[0];
+  if (photoFile){
+    if (assets){
+      try{
+        btn.textContent = 'Uploading photo...';
+        const uploaded = await assets.upload(photoFile);
+        item.photoUrl = uploaded.url;
+      }catch(err){
+        notice('Could not upload the photo, posting without it.', false);
+      }
+    } else {
+      notice('Photo upload isn\'t available right now — posting without it.', false);
+    }
+  }
+
+  try{
+    const id = 'l_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+    await db.doc('listings/' + id).set(item);
+    notice('Listing posted! Switch to Browse to see it.', true);
+    sellForm.reset();
+    document.getElementById('photoPreview').innerHTML = '';
+  }catch(err){
+    if (err && (err.code === 'not_writer' || err.code === 'permission_denied')){
+      notice('You need edit access on this page to post a listing. Ask whoever shared it to give you edit access.', false);
+    } else {
+      notice('Something went wrong posting your listing. Please try again.', false);
+    }
+  }
+  btn.disabled = false; btn.textContent = 'Post listing';
+});
+
+init();
+
+document.getElementById('signupForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  profile = {
+    name: document.getElementById('s_name').value.trim(),
+    email: document.getElementById('s_email').value.trim(),
+    phone: document.getElementById('s_phone').value.trim(),
+    branch: document.getElementById('s_branch').value.trim(),
+    year: document.getElementById('s_year').value
+  };
+  saveLocalProfile(profile);
+  await syncProfileToDb();
+  renderUserbar();
+  closeSignup();
+
+  if (pendingAction === 'sell'){
+    document.querySelector('.tab[data-tab="sell"]').click();
+  } else if (pendingAction && pendingAction.type === 'open'){
+    window.open(pendingAction.url, '_blank');
+  }
+  pendingAction = null;
+});
+document.getElementById('signupClose').addEventListener('click', () => { pendingAction = null; closeSignup(); });
+document.getElementById('signupOverlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('signupOverlay')){ pendingAction = null; closeSignup(); }
+});
+
+document.getElementById('profileClose').addEventListener('click', closeProfile);
+document.getElementById('profileOverlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('profileOverlay')) closeProfile();
+});
+document.getElementById('profileEdit').addEventListener('click', () => { closeProfile(); openSignup(); });
+document.getElementById('profileSignout').addEventListener('click', () => {
+  try{ localStorage.removeItem('ce_profile'); }catch(e){}
+  profile = null;
+  closeProfile();
+  renderUserbar();
+});
+
+try{
+  if (!sessionStorage.getItem('ce_about_seen')){
+    openAbout();
+    sessionStorage.setItem('ce_about_seen', '1');
+  }
+}catch(e){ /* storage unavailable, skip auto-open */ }
+</script>
+</body>
+</html>
